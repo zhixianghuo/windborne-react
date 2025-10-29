@@ -1,4 +1,4 @@
-import { WindCacheItem } from '../types';
+import { WindCacheItem, BalloonTrack, BalloonPoint } from '../types';
 
 // Weather data cache and request rate limiting
 const windCache = new Map<string, WindCacheItem>();
@@ -90,12 +90,11 @@ export async function loadWind(lat: number, lon: number, ts: number): Promise<Wi
  * @returns Promise that resolves when enrichment is complete
  */
 export async function enrichWithWind(
-  tracks: Record<string, any>, 
+  tracks: Record<string, BalloonTrack>, 
   angleDiff: (a: number, b: number) => number
 ): Promise<void> {
   const limit = 5; // Reduce concurrent requests to avoid API throttling
-  const queue: Promise<any>[] = [];
-  let enrichedCount = 0;
+  const queue: Promise<void>[] = [];
   
   // Smart sampling: adjust strategy based on number of balloons
   const trackArray = Object.values(tracks);
@@ -119,7 +118,6 @@ export async function enrichWithWind(
             p.windDir = w.windDir; 
             p.windSpeed = w.windSpeed; 
             p.temp = w.temp;
-            enrichedCount++;
             
             
             if (p.bearing != null && w.windDir != null) {
@@ -156,7 +154,7 @@ export async function enrichWithWind(
     if (points.length === 0) continue;
     
     // Find points with wind data
-    const enrichedPoints = points.filter((p: any) => p.windDir != null && p.windSpeed != null);
+    const enrichedPoints = points.filter((p: BalloonPoint) => p.windDir != null && p.windSpeed != null);
     if (enrichedPoints.length === 0) continue;
     
     // Assign closest wind data to points without wind data

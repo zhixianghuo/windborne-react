@@ -12,9 +12,8 @@ import { loadWind } from "../services/windService";
 import { angleDiff } from "../utils/math";
 
 // Dynamic import of Leaflet packages for client-side only
-let ReactLeaflet: any = null;
+let ReactLeaflet: typeof import("react-leaflet") | null = null;
 if (typeof window !== "undefined") {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   ReactLeaflet = require("react-leaflet");
 }
 
@@ -155,9 +154,9 @@ export default function Page() {
         setLastUpdated(Date.now());
       }
       if (!selectedId) setSelectedId(Object.keys(map)[0] ?? null);
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Load error:", e);
-      setError(e?.message ?? "Load failed");
+      setError(e instanceof Error ? e.message : "Load failed");
     } finally {
       setLoading(false);
     }
@@ -176,7 +175,7 @@ export default function Page() {
     if (selectedId && enableWindData) {
       loadWindDataForSelectedBalloon();
     }
-  }, [selectedId, enableWindData]);
+  }, [selectedId, enableWindData, loadWindDataForSelectedBalloon]);
 
   // Removed leaderboard since we no longer pre-load consistency data
 
@@ -229,7 +228,7 @@ export default function Page() {
               </h3>
               {searchQuery ? (
                 <div className="text-sm text-slate-600">
-                  <p>Found {Object.keys(filteredTracks).length} balloons matching "{searchQuery}"</p>
+                  <p>Found {Object.keys(filteredTracks).length} balloons matching &quot;{searchQuery}&quot;</p>
                   <button 
                     onClick={() => setSearchQuery("")}
                     className="mt-2 text-blue-600 hover:text-blue-800 underline"

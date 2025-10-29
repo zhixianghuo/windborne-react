@@ -56,7 +56,7 @@ export const bearing = (lat1: number, lon1: number, lat2: number, lon2: number) 
  * @returns Angle difference in degrees (0-180)
  */
 export const angleDiff = (a: number, b: number) => {
-  let d = Math.abs(a - b) % 360;
+  const d = Math.abs(a - b) % 360;
   return d > 180 ? 360 - d : d;
 };
 
@@ -65,7 +65,7 @@ export const angleDiff = (a: number, b: number) => {
  * @param x - Value to convert
  * @returns Number if valid, undefined otherwise
  */
-export const coerceNumber = (x: any): number | undefined => {
+export const coerceNumber = (x: unknown): number | undefined => {
   if (x == null) return undefined;
   const n = Number(x);
   return Number.isFinite(n) ? n : undefined;

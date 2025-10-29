@@ -29,7 +29,7 @@ async function fetchHour(hh: string) {
  * @param hourlyPayloads - Array of hourly data payloads from the API
  * @returns Map of balloon tracks keyed by balloon ID
  */
-function sanitizeAndGroup(hourlyPayloads: any[]): Record<string, BalloonTrack> {
+function sanitizeAndGroup(hourlyPayloads: unknown[]): Record<string, BalloonTrack> {
   const map: Record<string, BalloonTrack> = {};
   
   const pushPoint = (id: string, p: BalloonPoint) => {
@@ -43,11 +43,9 @@ function sanitizeAndGroup(hourlyPayloads: any[]): Record<string, BalloonTrack> {
   
   for (let hourIndex = 0; hourIndex < hourlyPayloads.length; hourIndex++) {
     const payload = hourlyPayloads[hourIndex];
-    const arr = Array.isArray(payload) ? payload : (payload?.data ?? payload ?? []);
+    const arr = Array.isArray(payload) ? payload : ((payload as any)?.data ?? payload ?? []);
     
     // Calculate timestamp for this hour (assuming data goes back 23 hours from current time)
-    const currentHour = new Date().getHours();
-    const targetHour = (currentHour - 23 + hourIndex + 24) % 24; // Start from 23 hours ago
     const hourTimestamp = Math.floor(Date.now() / 1000) - (23 - hourIndex) * 3600;
     
     
@@ -65,11 +63,12 @@ function sanitizeAndGroup(hourlyPayloads: any[]): Record<string, BalloonTrack> {
         ts = hourTimestamp + i * 60; // 1 minute interval between points
       } else if (typeof row === 'object' && row !== null) {
         // Object format
-        id = String(row.id ?? row.name ?? row.device_id ?? row.balloon_id ?? `balloon_${i}`);
-        lat = coerceNumber(row.lat ?? row.latitude);
-        lon = coerceNumber(row.lon ?? row.longitude);
-        alt = coerceNumber(row.alt ?? row.altitude);
-        const tsRaw = row.ts ?? row.timestamp ?? row.time;
+        const rowObj = row as any;
+        id = String(rowObj.id ?? rowObj.name ?? rowObj.device_id ?? rowObj.balloon_id ?? `balloon_${i}`);
+        lat = coerceNumber(rowObj.lat ?? rowObj.latitude);
+        lon = coerceNumber(rowObj.lon ?? rowObj.longitude);
+        alt = coerceNumber(rowObj.alt ?? rowObj.altitude);
+        const tsRaw = rowObj.ts ?? rowObj.timestamp ?? rowObj.time;
         ts = typeof tsRaw === "number" ? tsRaw : Date.parse(tsRaw ?? "") / 1000;
       } else {
         continue;

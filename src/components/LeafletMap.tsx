@@ -2,15 +2,13 @@
 
 import React, { useEffect, useMemo, useRef } from "react";
 import { MapProps } from '../types';
-import { formatKmh, scoreColor } from '../utils/formatters';
+import { formatKmh } from '../utils/formatters';
 
 // Dynamic import of Leaflet packages for client-side only
 let LeafletPkg: any = null;
 let ReactLeaflet: any = null;
 if (typeof window !== "undefined") {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   LeafletPkg = require("leaflet");
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   ReactLeaflet = require("react-leaflet");
 }
 
@@ -73,7 +71,7 @@ export default function LeafletMap({
   }, [tracks, maxBalloons]);
 
   // Adjust trajectory point density based on zoom level
-  const getSimplifiedPoints = (points: any[]) => {
+  const getSimplifiedPoints = (points: Array<{ lat: number; lon: number }>) => {
     if (zoomLevel <= 2) {
       // World map level: take every 10th point, maintain basic trajectory shape
       return points.filter((_, index) => index % 10 === 0 || index === points.length - 1);
