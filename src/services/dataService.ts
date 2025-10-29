@@ -43,7 +43,7 @@ function sanitizeAndGroup(hourlyPayloads: unknown[]): Record<string, BalloonTrac
   
   for (let hourIndex = 0; hourIndex < hourlyPayloads.length; hourIndex++) {
     const payload = hourlyPayloads[hourIndex];
-    const arr = Array.isArray(payload) ? payload : ((payload as Record<string, unknown>)?.data ?? payload ?? []);
+    const arr: unknown[] = Array.isArray(payload) ? payload : (Array.isArray((payload as Record<string, unknown>)?.data) ? (payload as Record<string, unknown>).data as unknown[] : []);
     
     // Calculate timestamp for this hour (assuming data goes back 23 hours from current time)
     const hourTimestamp = Math.floor(Date.now() / 1000) - (23 - hourIndex) * 3600;
@@ -69,7 +69,7 @@ function sanitizeAndGroup(hourlyPayloads: unknown[]): Record<string, BalloonTrac
         lon = coerceNumber(rowObj.lon ?? rowObj.longitude);
         alt = coerceNumber(rowObj.alt ?? rowObj.altitude);
         const tsRaw = rowObj.ts ?? rowObj.timestamp ?? rowObj.time;
-        ts = typeof tsRaw === "number" ? tsRaw : Date.parse(tsRaw ?? "") / 1000;
+        ts = typeof tsRaw === "number" ? tsRaw : Date.parse(String(tsRaw ?? "")) / 1000;
       } else {
         continue;
       }
