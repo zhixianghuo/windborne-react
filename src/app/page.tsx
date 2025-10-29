@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { MapPin } from "lucide-react";
 import ClientOnlyMap from "../components/ClientOnlyMap";
 import LeafletMap from "../components/LeafletMap";
@@ -14,6 +14,7 @@ import { angleDiff } from "../utils/math";
 // Dynamic import of Leaflet packages for client-side only
 let ReactLeaflet: typeof import("react-leaflet") | null = null;
 if (typeof window !== "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   ReactLeaflet = require("react-leaflet");
 }
 
@@ -40,7 +41,7 @@ export default function Page() {
    * It loads wind data for the last 5 points of the selected balloon and propagates
    * the data to all other points for consistency calculation.
    */
-  async function loadWindDataForSelectedBalloon() {
+  const loadWindDataForSelectedBalloon = useCallback(async () => {
     if (!selectedId || !tracks[selectedId] || !enableWindData) return;
     
     const track = tracks[selectedId];
@@ -124,7 +125,7 @@ export default function Page() {
     } finally {
       setLoadingWindData(false);
     }
-  }
+  }, [selectedId, tracks, enableWindData]);
 
   const filteredTracks = useMemo(() => {
     const prefix = "balloon_";

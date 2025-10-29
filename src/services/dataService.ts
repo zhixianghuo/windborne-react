@@ -43,7 +43,7 @@ function sanitizeAndGroup(hourlyPayloads: unknown[]): Record<string, BalloonTrac
   
   for (let hourIndex = 0; hourIndex < hourlyPayloads.length; hourIndex++) {
     const payload = hourlyPayloads[hourIndex];
-    const arr = Array.isArray(payload) ? payload : ((payload as any)?.data ?? payload ?? []);
+    const arr = Array.isArray(payload) ? payload : ((payload as Record<string, unknown>)?.data ?? payload ?? []);
     
     // Calculate timestamp for this hour (assuming data goes back 23 hours from current time)
     const hourTimestamp = Math.floor(Date.now() / 1000) - (23 - hourIndex) * 3600;
@@ -63,7 +63,7 @@ function sanitizeAndGroup(hourlyPayloads: unknown[]): Record<string, BalloonTrac
         ts = hourTimestamp + i * 60; // 1 minute interval between points
       } else if (typeof row === 'object' && row !== null) {
         // Object format
-        const rowObj = row as any;
+        const rowObj = row as Record<string, unknown>;
         id = String(rowObj.id ?? rowObj.name ?? rowObj.device_id ?? rowObj.balloon_id ?? `balloon_${i}`);
         lat = coerceNumber(rowObj.lat ?? rowObj.latitude);
         lon = coerceNumber(rowObj.lon ?? rowObj.longitude);
@@ -116,6 +116,6 @@ function sanitizeAndGroup(hourlyPayloads: unknown[]): Record<string, BalloonTrac
  */
 export async function loadAll24h(): Promise<Record<string, BalloonTrack>> {
   const settled = await Promise.allSettled(HOURS.map(fetchHour));
-  const ok = settled.filter(s => s.status === "fulfilled").map((s: any) => s.value);
+  const ok = settled.filter(s => s.status === "fulfilled").map((s: PromiseFulfilledResult<unknown>) => s.value);
   return sanitizeAndGroup(ok);
 }

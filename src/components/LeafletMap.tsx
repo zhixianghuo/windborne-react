@@ -5,10 +5,14 @@ import { MapProps } from '../types';
 import { formatKmh } from '../utils/formatters';
 
 // Dynamic import of Leaflet packages for client-side only
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let LeafletPkg: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let ReactLeaflet: any = null;
 if (typeof window !== "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   LeafletPkg = require("leaflet");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   ReactLeaflet = require("react-leaflet");
 }
 
@@ -22,6 +26,7 @@ export default function LeafletMap({
   onZoomChange,
 }: MapProps) {
   const { MapContainer, TileLayer, Polyline, Marker, Tooltip } = ReactLeaflet;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapRef = useRef<any>(null);
   const center = useMemo(() => ({ lat: 20, lon: 0 }), []);
 
@@ -131,6 +136,7 @@ export default function LeafletMap({
       maxBounds={[[-85, -180], [85, 180]]}
       maxBoundsViscosity={1.0}
       style={{ height: "520px", width: "100%" }} 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       whenCreated={(m: any) => (mapRef.current = m)}
     >
       <TileLayer
