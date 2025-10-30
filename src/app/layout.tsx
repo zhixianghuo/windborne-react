@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Windborne",
+  title: "24H Ballon Constellation Viewer",
   description: "24H Ballon Constellation Viewer",
 };
 
